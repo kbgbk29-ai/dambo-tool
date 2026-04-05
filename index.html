@@ -21,7 +21,7 @@ const CAT_ORDER = ["암 진단", "암 치료", "뇌혈관", "심장", "수술", 
 async function compareWithClaude(a, b) {
   const nameA = `${a.name} (${a.sub})`;
   const nameB = `${b.name} (${b.sub})`;
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
+  const res = await fetch("/api/compare", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
