@@ -26,7 +26,7 @@ async function compareWithClaude(a, b) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 1200,
+      max_tokens: 800,
       messages: [{
         role: "user",
         content: `당신은 DB손해보험 보험설계사 전용 담보 분석 전문가입니다.
