@@ -1,3 +1,5 @@
+const https = require("https");
+
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -11,25 +13,42 @@ module.exports = async function handler(req, res) {
 
   try {
     let body = req.body;
-    if (!body) return res.status(400).json({ error: "요청 내용이 없습니다." });
     if (typeof body === "string") body = JSON.parse(body);
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: body.model || "claude-sonnet-4-20250514",
-        max_tokens: 800,,
-        messages: body.messages,
-      }),
+    const payload = JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 800,
+      messages: body.messages,
     });
 
-    const data = await response.json();
-    return res.status(response.status).json(data);
+    const data = await new Promise((resolve, reject) => {
+      const options = {
+        hostname: "api.anthropic.com",
+        path: "/v1/messages",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+          "Content-Length": Buffer.byteLength(payload),
+        },
+      };
+
+      const request = https.request(options, (response) => {
+        let raw = "";
+        response.on("data", (chunk) => raw += chunk);
+        response.on("end", () => {
+          try { resolve(JSON.parse(raw)); }
+          catch (e) { reject(new Error("응답 파싱 실패: " + raw)); }
+        });
+      });
+
+      request.on("error", reject);
+      request.write(payload);
+      request.end();
+    });
+
+    return res.status(200).json(data);
 
   } catch (error) {
     return res.status(500).json({ error: error.message });
