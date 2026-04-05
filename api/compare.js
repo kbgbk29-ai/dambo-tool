@@ -8,7 +8,7 @@ module.exports = async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "API 키가 없습니다." });
 
   try {
@@ -23,18 +23,19 @@ module.exports = async function handler(req, res) {
     const userMessage = body.messages[0].content;
 
     const payload = JSON.stringify({
-      contents: [{ parts: [{ text: userMessage }] }],
-      generationConfig: { maxOutputTokens: 1000, temperature: 0.7 }
+      model: "gpt-4o-mini",
+      max_tokens: 1000,
+      messages: [{ role: "user", content: userMessage }]
     });
 
     const data = await new Promise((resolve, reject) => {
-      const path = `/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`;
       const options = {
-        hostname: "generativelanguage.googleapis.com",
-        path: path,
+        hostname: "api.openai.com",
+        path: "/v1/chat/completions",
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`,
           "Content-Length": Buffer.byteLength(payload),
         },
       };
@@ -44,9 +45,10 @@ module.exports = async function handler(req, res) {
         response.on("data", chunk => raw += chunk);
         response.on("end", () => {
           try {
-            const geminiData = JSON.parse(raw);
-            console.log("Gemini raw:", JSON.stringify(geminiData).slice(0, 300));
-            const text = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || "오류: " + JSON.stringify(geminiData).slice(0, 200);
+            const openaiData = JSON.parse(raw);
+            console.log("OpenAI 응답:", JSON.stringify(openaiData).slice(0, 200));
+            const text = openaiData?.choices?.[0]?.message?.content || "오류: " + JSON.stringify(openaiData).slice(0, 200);
+            // Anthropic 형식으로 변환 (index.html이 그대로 읽을 수 있게)
             resolve({ content: [{ type: "text", text: text }] });
           } catch (e) {
             reject(new Error("파싱 실패: " + raw));
