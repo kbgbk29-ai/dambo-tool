@@ -12,8 +12,15 @@ module.exports = async function handler(req, res) {
   if (!apiKey) return res.status(500).json({ error: "API 키가 없습니다." });
 
   try {
-    let body = req.body;
-    if (typeof body === "string") body = JSON.parse(body);
+    // req.body를 직접 스트림에서 읽기
+    const rawBody = await new Promise((resolve, reject) => {
+      let data = "";
+      req.on("data", chunk => data += chunk);
+      req.on("end", () => resolve(data));
+      req.on("error", reject);
+    });
+
+    const body = JSON.parse(rawBody);
 
     const payload = JSON.stringify({
       model: "claude-sonnet-4-20250514",
@@ -36,10 +43,10 @@ module.exports = async function handler(req, res) {
 
       const request = https.request(options, (response) => {
         let raw = "";
-        response.on("data", (chunk) => raw += chunk);
+        response.on("data", chunk => raw += chunk);
         response.on("end", () => {
           try { resolve(JSON.parse(raw)); }
-          catch (e) { reject(new Error("응답 파싱 실패: " + raw)); }
+          catch (e) { reject(new Error("파싱 실패: " + raw)); }
         });
       });
 
