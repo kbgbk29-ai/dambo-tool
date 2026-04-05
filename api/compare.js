@@ -8,11 +8,10 @@ module.exports = async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "API 키가 없습니다." });
 
   try {
-    // req.body를 직접 스트림에서 읽기
     const rawBody = await new Promise((resolve, reject) => {
       let data = "";
       req.on("data", chunk => data += chunk);
@@ -21,22 +20,21 @@ module.exports = async function handler(req, res) {
     });
 
     const body = JSON.parse(rawBody);
+    const userMessage = body.messages[0].content;
 
     const payload = JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 800,
-      messages: body.messages,
+      contents: [{ parts: [{ text: userMessage }] }],
+      generationConfig: { maxOutputTokens: 1000, temperature: 0.7 }
     });
 
     const data = await new Promise((resolve, reject) => {
+      const path = `/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
       const options = {
-        hostname: "api.anthropic.com",
-        path: "/v1/messages",
+        hostname: "generativelanguage.googleapis.com",
+        path: path,
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": apiKey,
-          "anthropic-version": "2023-06-01",
           "Content-Length": Buffer.byteLength(payload),
         },
       };
@@ -45,8 +43,13 @@ module.exports = async function handler(req, res) {
         let raw = "";
         response.on("data", chunk => raw += chunk);
         response.on("end", () => {
-          try { resolve(JSON.parse(raw)); }
-          catch (e) { reject(new Error("파싱 실패: " + raw)); }
+          try {
+            const geminiData = JSON.parse(raw);
+            const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "응답을 받지 못했습니다.";
+            resolve({ content: [{ type: "text", text: text }] });
+          } catch (e) {
+            reject(new Error("파싱 실패: " + raw));
+          }
         });
       });
 
@@ -61,3 +64,4 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: error.message });
   }
 };
+a
