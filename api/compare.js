@@ -28,7 +28,7 @@ module.exports = async function handler(req, res) {
     });
 
     const data = await new Promise((resolve, reject) => {
-      const path = `/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+      const path = `/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
       const options = {
         hostname: "generativelanguage.googleapis.com",
         path: path,
@@ -45,7 +45,8 @@ module.exports = async function handler(req, res) {
         response.on("end", () => {
           try {
             const geminiData = JSON.parse(raw);
-            const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "응답을 받지 못했습니다.";
+            console.log("Gemini raw:", JSON.stringify(geminiData).slice(0, 300));
+            const text = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || "오류: " + JSON.stringify(geminiData).slice(0, 200);
             resolve({ content: [{ type: "text", text: text }] });
           } catch (e) {
             reject(new Error("파싱 실패: " + raw));
