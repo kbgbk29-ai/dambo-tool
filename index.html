@@ -68,6 +68,8 @@ ${textB}
 }
 
 function Md({ text }) {
+  // 마크다운 테이블 제거 (| 로 시작하는 줄 전체 삭제)
+  text = text.replace(/\|.*\|\n?/g, "").replace(/\n{3,}/g, "\n\n");
   const blocks = text.split(/\n{2,}/);
   return (
     <div style={{ fontSize: 13.5, color: "#1F2937" }}>
