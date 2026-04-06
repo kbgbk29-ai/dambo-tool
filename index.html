@@ -1,202 +1,155 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>디비디비딥 / 담보 비교 분석기</title>
-
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-<style>
-body {
-  margin: 0;
-  background: #F5F7FA;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(10px);}
-  to { opacity: 1; transform: translateY(0);}
-}
-
-@keyframes pulse {
-  0% { transform: scale(1);}
-  50% { transform: scale(1.02);}
-  100% { transform: scale(1);}
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>담보 비교</title>
 </head>
-
 <body>
+
 <div id="root"></div>
 
 <script type="text/babel">
-const { useState } = React;
 
-function App(){
+<div
+  style={{
+    background: "#FFF",
+    border: "1.5px solid #E5E7EB",
+    borderRadius: 10,
+    padding: "10px 14px",
+    marginBottom: 12,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "stretch",
+    gap: 10
+  }}
+>
+  {[["A", selA, "#1D4ED8", "#DBEAFE"], ["B", selB, "#DC2626", "#FEE2E2"]].map(([lbl, sel, tc, bg], idx) => (
+    <>
 
-  const [selA, setSelA] = useState(null);
-  const [selB, setSelB] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState("");
-  const [winner, setWinner] = useState(null);
-
-  const compare = () => {
-    setLoading(true);
-    setResult("");
-    setWinner(null);
-
-    setTimeout(()=>{
-      setLoading(false);
-
-      // 🔥 예시 로직 (나중에 AI 붙이면 됨)
-      const win = Math.random() > 0.5 ? "A" : "B";
-      setWinner(win);
-
-      setResult(
-        win === "A"
-        ? "👉 A 담보가 보장 범위가 더 넓고 유리합니다.\n👉 보험료는 다소 높을 수 있습니다."
-        : "👉 B 담보가 가성비 측면에서 더 유리합니다.\n👉 보장 범위는 일부 제한될 수 있습니다."
-      );
-    },1000);
-  };
-
-  const Card = ({label, sel, color, bg}) => (
-    <div
-      style={{
-        background:"#FFF",
-        borderRadius:14,
-        padding:14,
-        border: winner === label ? `2px solid ${color}` : "1px solid #E5E7EB",
-        display:"flex",
-        gap:10,
-        alignItems:"center",
-        animation: winner === label ? "pulse 0.6s ease" : "none"
-      }}
-    >
-      <div style={{
-        background:bg,
-        color:color,
-        padding:"4px 8px",
-        borderRadius:6,
-        fontWeight:700,
-        fontSize:12
-      }}>
-        {label}
-      </div>
-
-      <div style={{flex:1}}>
-        {sel ? (
-          <>
-            <div style={{fontWeight:700,fontSize:14}}>{sel.name}</div>
-            <div style={{fontSize:12,color:"#6B7280"}}>{sel.sub}</div>
-          </>
-        ):(
-          <div style={{color:"#9CA3AF"}}>담보를 선택하세요</div>
-        )}
-      </div>
-
-      {winner === label && (
-        <div style={{
-          fontSize:12,
-          fontWeight:700,
-          color:"#10B981"
-        }}>
-          ✔ 추천
+      {/* A 카드 */}
+      {idx === 0 && (
+        <div key={lbl} style={{ display: "flex", alignItems: "center", gap: 7, width: "100%" }}>
+          <div style={{ background: bg, color: tc, borderRadius: 6, padding: "2px 7px", fontSize: 10, fontWeight: 700 }}>
+            {lbl}
+          </div>
+          <div style={{ fontWeight: 600, fontSize: 13, color: sel ? "#111827" : "#D1D5DB", lineHeight: 1.3 }}>
+            {sel ? (
+              <>
+                {sel.name}
+                <br />
+                <span style={{ fontWeight: 400, fontSize: 11, color: "#6B7280" }}>{sel.sub}</span>
+              </>
+            ) : (
+              "담보를 선택하세요"
+            )}
+          </div>
         </div>
       )}
-    </div>
-  );
-
-  return (
-    <div style={{maxWidth:420,margin:"0 auto",padding:16}}>
-
-      <div style={{fontWeight:800,fontSize:18,marginBottom:12}}>
-        담보 비교 분석
-      </div>
-
-      {/* A */}
-      <Card label="A" sel={selA} color="#2563EB" bg="#DBEAFE"/>
 
       {/* VS (토스 스타일) */}
-      <div style={{
-        display:"flex",
-        alignItems:"center",
-        gap:8,
-        margin:"12px 0",
-        color:"#9CA3AF"
-      }}>
-        <div style={{flex:1,height:1,background:"#E5E7EB"}}/>
-        <span style={{fontSize:12,fontWeight:700}}>VS</span>
-        <div style={{flex:1,height:1,background:"#E5E7EB"}}/>
-      </div>
-
-      {/* B */}
-      <Card label="B" sel={selB} color="#DC2626" bg="#FEE2E2"/>
-
-      {/* 버튼 */}
-      <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:14}}>
-
-        {(selA || selB) && (
-          <button
-            onClick={()=>{setSelA(null);setSelB(null);setResult("");setWinner(null);}}
-            style={{
-              padding:"12px",
-              borderRadius:10,
-              border:"1px solid #E5E7EB",
-              background:"#FFF"
-            }}
-          >
-            초기화
-          </button>
-        )}
-
-        <button
-          onClick={compare}
-          disabled={!selA || !selB || loading}
-          style={{
-            padding:"16px",
-            borderRadius:12,
-            border:"none",
-            fontWeight:800,
-            fontSize:15,
-            color:"#FFF",
-            background: (!selA || !selB) ? "#CBD5E1" : "linear-gradient(135deg,#2563EB,#3B82F6)",
-            boxShadow:"0 4px 14px rgba(37,99,235,0.3)"
-          }}
-        >
-          {loading ? "분석 중..." : "🔍 비교분석"}
-        </button>
-      </div>
-
-      {/* 결과 */}
-      {result && (
-        <div
-          style={{
-            marginTop:16,
-            background:"#FFF",
-            borderRadius:14,
-            padding:16,
-            border:"1px solid #E5E7EB",
-            animation:"fadeUp 0.4s ease"
-          }}
-        >
-          <div style={{fontWeight:800,marginBottom:8}}>
-            📊 분석 결과
+      {idx === 1 && (
+        <>
+          <div style={{
+            display:"flex",
+            alignItems:"center",
+            gap:8,
+            margin:"4px 0",
+            color:"#9CA3AF"
+          }}>
+            <div style={{flex:1,height:1,background:"#E5E7EB"}}/>
+            <span style={{fontSize:12,fontWeight:700}}>VS</span>
+            <div style={{flex:1,height:1,background:"#E5E7EB"}}/>
           </div>
 
-          <div style={{whiteSpace:"pre-line",fontSize:14,lineHeight:1.5}}>
-            {result}
+          {/* B 카드 */}
+          <div key={lbl} style={{ display: "flex", alignItems: "center", gap: 7, width: "100%" }}>
+            <div style={{ background: bg, color: tc, borderRadius: 6, padding: "2px 7px", fontSize: 10, fontWeight: 700 }}>
+              {lbl}
+            </div>
+            <div style={{ fontWeight: 600, fontSize: 13, color: sel ? "#111827" : "#D1D5DB", lineHeight: 1.3 }}>
+              {sel ? (
+                <>
+                  {sel.name}
+                  <br />
+                  <span style={{ fontWeight: 400, fontSize: 11, color: "#6B7280" }}>{sel.sub}</span>
+                </>
+              ) : (
+                "담보를 선택하세요"
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
-    </div>
-  );
-}
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </>
+  ))}
+
+  {/* 버튼 영역 */}
+  <div style={{ display: "flex", gap: 6, justifyContent: "center" }}>
+    {(selA || selB) && (
+      <button
+        onClick={() => {
+          setSelA(null);
+          setSelB(null);
+          setResult("");
+          setError("");
+        }}
+        style={{
+          background: "none",
+          border: "1.5px solid #E5E7EB",
+          borderRadius: 7,
+          padding: "7px 12px",
+          fontSize: 12,
+          color: "#6B7280",
+          cursor: "pointer"
+        }}
+      >
+        초기화
+      </button>
+    )}
+
+    <button
+      onClick={compare}
+      disabled={!selA || !selB || loading}
+      style={{
+        background: (!selA || !selB || loading)
+          ? "#E5E7EB"
+          : `linear-gradient(135deg,${cc},${cc}CC)`,
+        color: (!selA || !selB || loading) ? "#9CA3AF" : "#FFF",
+        border: "none",
+        borderRadius: 7,
+        padding: "8px 18px",
+        fontSize: 13,
+        fontWeight: 700,
+        cursor: (!selA || !selB || loading) ? "default" : "pointer",
+        display: "flex",
+        alignItems: "center",
+        gap: 6
+      }}
+    >
+      {loading ? (
+        <>
+          <span
+            style={{
+              width: 13,
+              height: 13,
+              border: "2px solid #D1D5DB",
+              borderTopColor: "#6B7280",
+              borderRadius: "50%",
+              display: "inline-block",
+              animation: "spin .8s linear infinite"
+            }}
+          />
+          분석 중
+        </>
+      ) : (
+        "🔍 비교분석"
+      )}
+    </button>
+  </div>
+</div>
+
 </script>
 
 </body>
