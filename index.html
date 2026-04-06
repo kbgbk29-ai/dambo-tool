@@ -23,8 +23,8 @@ const CAT_ORDER = ["암 진단", "암 치료", "뇌혈관", "심장", "수술", 
 async function compareWithClaude(a, b) {
   const nameA = `${a.name} (${a.sub})`;
   const nameB = `${b.name} (${b.sub})`;
-  const textA = a.text.slice(0, 2000);
-  const textB = b.text.slice(0, 2000);
+  const textA = a.text.slice(0, 500);
+  const textB = b.text.slice(0, 500);
   const res = await fetch("/api/compare", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
