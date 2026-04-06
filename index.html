@@ -23,6 +23,8 @@ const CAT_ORDER = ["암 진단", "암 치료", "뇌혈관", "심장", "수술", 
 async function compareWithClaude(a, b) {
   const nameA = `${a.name} (${a.sub})`;
   const nameB = `${b.name} (${b.sub})`;
+  const textA = a.text.slice(0, 2000);
+  const textB = b.text.slice(0, 2000);
   const res = await fetch("/api/compare", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -39,10 +41,10 @@ async function compareWithClaude(a, b) {
 - 두 번째: ${nameB}
 
 【첫 번째 담보 약관】
-${a.text}
+${textA}
 
 【두 번째 담보 약관】
-${b.text}
+${textB}
 
 ⚠️ 필수 규칙: "담보 A" "담보 B" 라는 표현은 절대 쓰지 마세요.
 반드시 실제 담보명을 **굵게** 표기하세요.
