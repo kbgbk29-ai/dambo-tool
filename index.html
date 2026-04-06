@@ -250,19 +250,6 @@ function App() {
           })}
         </div>
 
-import { useEffect, useState } from "react";
-
-const isMobileWidth = () => window.innerWidth < 640;
-
-const [isMobile, setIsMobile] = useState(isMobileWidth());
-
-useEffect(() => {
-  const handleResize = () => setIsMobile(isMobileWidth());
-  window.addEventListener("resize", handleResize);
-  return () => window.removeEventListener("resize", handleResize);
-}, []);
-
-return (
   <div
     style={{
       background: "#FFF",
