@@ -23,7 +23,7 @@ module.exports = async function handler(req, res) {
     const userMessage = body.messages[0].content;
 
     const payload = JSON.stringify({
-      model: "gemma2-9b-it",
+      model: "mixtral-8x7b-32768",
       max_tokens: 1000,
       messages: [{ role: "user", content: userMessage }]
     });
