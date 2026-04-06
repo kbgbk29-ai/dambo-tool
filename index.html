@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>담보 비교 분석기</title>
+<title>디비디비딥 / 담보 비교 분석기</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -277,7 +277,7 @@ function App() {
         {(result || error || loading) && (
           <div ref={resultRef} style={{ background: "#FFF", border: "1.5px solid #E5E7EB", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,.07)" }}>
             <div style={{ background: "linear-gradient(135deg,#0F172A,#1E3A8A)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              <span style={{ background: "#3B82F6", color: "#FFF", borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 700 }}>AI 분석</span>
+              <span style={{ background: "#3B82F6", color: "#FFF", borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 700 }}>분석</span>
               <span style={{ background: "#1E40AF", color: "#BFDBFE", borderRadius: 6, padding: "3px 9px", fontSize: 11.5, fontWeight: 700 }}>A. {selA?.name} ({selA?.sub})</span>
               <span style={{ color: "#475569", fontSize: 10 }}>vs</span>
               <span style={{ background: "#991B1B", color: "#FECACA", borderRadius: 6, padding: "3px 9px", fontSize: 11.5, fontWeight: 700 }}>B. {selB?.name} ({selB?.sub})</span>
