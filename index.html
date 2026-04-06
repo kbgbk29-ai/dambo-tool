@@ -33,7 +33,7 @@ async function compareWithClaude(a, b) {
       max_tokens: 1200,
       messages: [{
         role: "user",
-        content: `YOU MUST REPLY IN KOREAN ONLY. DO NOT USE ANY OTHER LANGUAGE.
+        content: `YOU MUST REPLY IN KOREAN ONLY. NO ENGLISH, NO CHINESE, NO RUSSIAN, NO VIETNAMESE. KOREAN ONLY.
 당신은 DB손해보험 보험설계사 전용 담보 분석 전문가입니다. 반드시 한국어로만 답변하세요.
 아래 두 담보의 약관을 읽고, 설계사가 고객에게 바로 설명할 수 있도록 차이점 중심으로 분석해주세요.
 
@@ -148,7 +148,8 @@ function App() {
     if (selA.id === cov.id) { setSelA(selB); setSelB(null); setResult(""); return; }
     if (!selB) { setSelB(cov); return; }
     if (selB.id === cov.id) { setSelB(null); setResult(""); return; }
-    setSelA(cov); setSelB(null); setResult(""); setError("");
+    // A, B 둘 다 선택된 상태에서 새 카드 클릭 → B를 교체
+    setSelB(cov); setResult(""); setError("");
   };
 
   const switchGroup = (g) => {
@@ -262,7 +263,7 @@ function App() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 7 }}>
             {group.coverages.map(cov => {
               const isA = selA?.id === cov.id, isB = selB?.id === cov.id, isSel = isA || isB;
-              const isDisabled = selA && selB && !isSel;
+              const isDisabled = false;
               return (
                 <div key={cov.id} onClick={() => !isDisabled && pickCard(cov)} style={{ background: isA ? "#EFF6FF" : isB ? "#FFF0F0" : "#FFF", border: isA ? "2px solid #3B82F6" : isB ? "2px solid #EF4444" : "1.5px solid #E5E7EB", borderRadius: 10, padding: "11px 12px", cursor: isDisabled ? "not-allowed" : "pointer", opacity: isDisabled ? .4 : 1, position: "relative" }}>
                   {isSel && <div style={{ position: "absolute", top: 8, right: 8, width: 19, height: 19, borderRadius: "50%", background: isA ? "#3B82F6" : "#EF4444", color: "#FFF", fontSize: 10, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>{isA ? "A" : "B"}</div>}
