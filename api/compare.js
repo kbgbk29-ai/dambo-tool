@@ -46,7 +46,7 @@ module.exports = async function handler(req, res) {
         response.on("end", () => {
           try {
             const groqData = JSON.parse(raw);
-            const text = groqData?.choices?.[0]?.message?.content || "Error: " + JSON.stringify(groqData).slice(0, 200);
+            let text = groqData?.choices?.[0]?.message?.content || "Error: " + JSON.stringify(groqData).slice(0, 200); text = text.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
             resolve({ content: [{ type: "text", text: text }] });
           } catch (e) {
             reject(new Error("Parse error: " + raw));
