@@ -92,6 +92,7 @@ function Md({ text }) {
           </div>
         );
       })}
+      </div>
     </div>
   );
 }
@@ -212,7 +213,35 @@ function App() {
         <div style={{ background: "rgba(34,197,94,.15)", border: "1px solid rgba(34,197,94,.4)", color: "#86EFAC", borderRadius: 9999, padding: "3px 9px", fontSize: 10, fontWeight: 700 }}>v3.1</div>
       </div>
 
-      <div style={{ maxWidth: 940, margin: "0 auto", padding: "14px 12px" }}>
+      <div style={{ display: "flex", gap: 0, alignItems: "flex-start" }}>
+
+      {/* 왼쪽 사이드바 */}
+      <div style={{ width: 200, flexShrink: 0, position: "sticky", top: 55, height: "calc(100vh - 55px)", background: "#1E293B", padding: "24px 16px", display: "flex", flexDirection: "column", gap: 20, overflowY: "auto" }}>
+        <div>
+          <div style={{ color: "#94A3B8", fontSize: 9.5, fontWeight: 700, letterSpacing: 1, marginBottom: 10 }}>DEVELOPER</div>
+          <div style={{ color: "#F8FAFC", fontSize: 12.5, fontWeight: 700, lineHeight: 1.6 }}>DB손해보험<br/>서부산사업단 김해지점</div>
+          <div style={{ color: "#60A5FA", fontSize: 13, fontWeight: 700, marginTop: 6 }}>김범기 PA</div>
+        </div>
+
+        <div>
+          <div style={{ color: "#94A3B8", fontSize: 9.5, fontWeight: 700, letterSpacing: 1, marginBottom: 8 }}>CONTACT</div>
+          <div style={{ color: "#F8FAFC", fontSize: 12.5 }}>010-8300-5100</div>
+        </div>
+
+        <div style={{ borderTop: "1px solid #334155", paddingTop: 18 }}>
+          <div style={{ color: "#CBD5E1", fontSize: 11.5, lineHeight: 2 }}>
+            미흡하고 기능들이<br/>많이 부족합니다 😅<br/><br/>
+            많은 피드백과<br/>격려 부탁드립니다 ^^<br/><br/>
+            <span style={{ color: "#F472B6" }}>감사합니다 🙏<br/>사랑합니다 ❤️</span>
+          </div>
+        </div>
+
+        <div style={{ marginTop: "auto", color: "#475569", fontSize: 10, textAlign: "center" }}>
+          v3.1 · Powered by Groq
+        </div>
+      </div>
+
+      <div style={{ flex: 1, maxWidth: 940, margin: "0 auto", padding: "14px 12px" }}>
         <div style={{ background: "#FFF", borderRadius: 12, padding: "14px 16px", marginBottom: 12, boxShadow: "0 1px 4px rgba(0,0,0,.06)" }}>
           <div style={{ fontSize: 10, color: "#9CA3AF", fontWeight: 600, marginBottom: 10 }}>📂 담보 유형 선택</div>
           {CAT_ORDER.map(cat => {
