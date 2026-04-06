@@ -9,7 +9,7 @@ module.exports = async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: "API 키가 없습니다." });
+  if (!apiKey) return res.status(500).json({ error: "API key missing" });
 
   try {
     const rawBody = await new Promise((resolve, reject) => {
@@ -25,7 +25,7 @@ module.exports = async function handler(req, res) {
     const payload = JSON.stringify({
       model: "llama-3.3-70b-versatile",
       max_tokens: 1000,
-      반드시 한국어로만 답하세요. 필요하다면 약관에 있는 영어단어는 추가로 사용 가능. 한자, 아랍어 등 다른 언어는 절대 사용하지 마세요. messages: [{ role: "user", content: userMessage }]
+      messages: [{ role: "user", content: userMessage }]
     });
 
     const data = await new Promise((resolve, reject) => {
@@ -46,11 +46,10 @@ module.exports = async function handler(req, res) {
         response.on("end", () => {
           try {
             const groqData = JSON.parse(raw);
-            console.log("Groq 응답:", JSON.stringify(groqData).slice(0, 200));
-            const text = groqData?.choices?.[0]?.message?.content || "오류: " + JSON.stringify(groqData).slice(0, 200);
+            const text = groqData?.choices?.[0]?.message?.content || "Error: " + JSON.stringify(groqData).slice(0, 200);
             resolve({ content: [{ type: "text", text: text }] });
           } catch (e) {
-            reject(new Error("파싱 실패: " + raw));
+            reject(new Error("Parse error: " + raw));
           }
         });
       });
