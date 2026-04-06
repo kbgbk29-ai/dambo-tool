@@ -24,7 +24,7 @@ module.exports = async function handler(req, res) {
 
     const payload = JSON.stringify({
       model: "qwen/qwen3-32b",
-      max_tokens: 1000,
+      max_tokens: 3000,
       messages: [{ role: "user", content: userMessage }]
     });
 
