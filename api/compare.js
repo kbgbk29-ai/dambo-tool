@@ -48,6 +48,9 @@ module.exports = async function handler(req, res) {
           try {
             const raw = Buffer.concat(chunks).toString("utf8");
             const claudeData = JSON.parse(raw);
+            if (claudeData.error) {
+  return resolve({ content: [{ type: "text", text: "API 에러: " + JSON.stringify(claudeData.error) }] });
+}
             const text = claudeData?.content?.[0]?.text || "Error: " + JSON.stringify(claudeData).slice(0, 200);
             resolve({ content: [{ type: "text", text }] });
           } catch (e) {
