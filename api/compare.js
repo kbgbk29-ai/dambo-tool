@@ -2,9 +2,9 @@ const https = require("https");
 
 module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
 
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -15,7 +15,7 @@ module.exports = async function handler(req, res) {
   try {
     const rawBody = await new Promise((resolve, reject) => {
       let data = "";
-      req.on("data", chunk => data += chunk);
+      req.on("data", chunk => data += chunk.toString("utf8"));
       req.on("end", () => resolve(data));
       req.on("error", reject);
     });
@@ -35,28 +35,31 @@ module.exports = async function handler(req, res) {
         path: "/openai/v1/chat/completions",
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json; charset=utf-8",
           "Authorization": `Bearer ${apiKey}`,
-          "Content-Length": Buffer.byteLength(payload),
+          "Content-Length": Buffer.byteLength(payload, "utf8"),
         },
       };
 
       const request = https.request(options, (response) => {
-        let raw = "";
-        response.on("data", chunk => raw += chunk);
+        const chunks = [];
+        response.on("data", chunk => chunks.push(chunk));
         response.on("end", () => {
           try {
+            const raw = Buffer.concat(chunks).toString("utf8");
             const groqData = JSON.parse(raw);
-            let text = groqData?.choices?.[0]?.message?.content || "Error: " + JSON.stringify(groqData).slice(0, 200); text = text.replace(/<think>[\s\S]*?<\/think>/g, "").trim(); text = text.replace(/^---+$/gm, "").trim();
+            let text = groqData?.choices?.[0]?.message?.content || "Error: " + JSON.stringify(groqData).slice(0, 200);
+            text = text.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+            text = text.replace(/^---+$/gm, "").trim();
             resolve({ content: [{ type: "text", text: text }] });
           } catch (e) {
-            reject(new Error("Parse error: " + raw));
+            reject(new Error("Parse error"));
           }
         });
       });
 
       request.on("error", reject);
-      request.write(payload);
+      request.write(payload, "utf8");
       request.end();
     });
 
