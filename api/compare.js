@@ -23,7 +23,7 @@ module.exports = async function handler(req, res) {
     const userMessage = body.messages[0].content;
 
     const payload = JSON.stringify({
-      model: "llama-3.3-70b-versatile",
+      model: "gemma2-9b-it",
       max_tokens: 1000,
       messages: [{ role: "user", content: userMessage }]
     });
