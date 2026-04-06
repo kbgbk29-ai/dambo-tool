@@ -25,7 +25,7 @@ module.exports = async function handler(req, res) {
     const payload = JSON.stringify({
       model: "llama-3.3-70b-versatile",
       max_tokens: 1000,
-      messages: [{ role: "user", content: userMessage }]
+      반드시 한국어로만 답하세요. 필요하다면 약관에 있는 영어단어는 추가로 사용 가능. 한자, 아랍어 등 다른 언어는 절대 사용하지 마세요. messages: [{ role: "user", content: userMessage }]
     });
 
     const data = await new Promise((resolve, reject) => {
