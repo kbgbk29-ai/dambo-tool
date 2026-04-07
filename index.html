@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>디비디비딥 / 담보 비교 분석기</title>
+<title>디비디비딥/담보 비교 분석기</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -176,8 +176,8 @@ function App() {
 
       <div style={{ background: "linear-gradient(135deg,#0F172A,#1E3A8A)", padding: "12px 18px", display: "flex", alignItems: "center", gap: 10, position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 10px rgba(0,0,0,.4)", flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-          <div style={{ color: "#86EFAC", fontWeight: 700, fontSize: 14 }}>📋 [디비디비딥/담보 비교 분석기]</div>
-          <div style={{ color: "#86EFAC", fontWeight: 700, fontSize: 14 }}>DB손해보험 · 106개 담보</div>
+          <div style={{ color: "#86EFAC", fontWeight: 700, fontSize: 14 }}>[디비디비딥/담보 비교 분석기]</div>
+          <div style={{ color: "#86EFAC", fontWeight: 700, fontSize: 14 }}>DB손해보험 · 106개 주요 담보</div>
         </div>
         <div style={{ flex: 1, minWidth: 200, maxWidth: 380, position: "relative" }}>
           <div style={{ display: "flex", alignItems: "center", background: "rgba(255,255,255,.12)", border: "1.5px solid rgba(255,255,255,.2)", borderRadius: 9, padding: "6px 12px", gap: 8 }}>
@@ -411,9 +411,9 @@ function App() {
         {(result || error || loading) && (
           <div ref={resultRef} style={{ background: "#FFF", border: "1.5px solid #E5E7EB", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,.07)" }}>
             <div style={{ background: "linear-gradient(135deg,#0F172A,#1E3A8A)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              <span style={{ background: "#3B82F6", color: "#FFF", borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 700 }}>분석</span><br />
+              <span style={{ background: "#3B82F6", color: "#FFF", borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 700 }}>분석 결과</span><br />
               <span style={{ background: "#1E40AF", color: "#BFDBFE", borderRadius: 6, padding: "3px 9px", fontSize: 11.5, fontWeight: 700 }}>A. {selA?.name} ({selA?.sub})</span>
-              <span style={{ color: "#475569", fontSize: 10 }}>vs</span>
+              <span style={{ color: "#FFF", fontSize: 10 }}>vs</span>
               <span style={{ background: "#991B1B", color: "#FECACA", borderRadius: 6, padding: "3px 9px", fontSize: 11.5, fontWeight: 700 }}>B. {selB?.name} ({selB?.sub})</span>
             </div>
             <div style={{ padding: "22px 24px" }}>
