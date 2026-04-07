@@ -389,6 +389,42 @@ function App() {
   </div>
 </div>
 
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ fontSize: 11, color: "#6B7280", marginBottom: 8 }}>
+            <strong style={{ color: "#1E3A8A" }}>2개 클릭</strong> 후 비교분석 — {group.label} 총 {group.coverages.length}개
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 7 }}>
+            {group.coverages.map(cov => {
+              const isA = selA?.id === cov.id, isB = selB?.id === cov.id, isSel = isA || isB;
+              const isDisabled = selA && selB && !isSel;
+              return (
+                <div key={cov.id} onClick={() => !isDisabled && pickCard(cov)} style={{ background: isA ? "#EFF6FF" : isB ? "#FFF0F0" : "#FFF", border: isA ? "2px solid #3B82F6" : isB ? "2px solid #EF4444" : "1.5px solid #E5E7EB", borderRadius: 10, padding: "11px 12px", cursor: isDisabled ? "not-allowed" : "pointer", opacity: isDisabled ? .4 : 1, position: "relative" }}>
+                  {isSel && <div style={{ position: "absolute", top: 8, right: 8, width: 19, height: 19, borderRadius: "50%", background: isA ? "#3B82F6" : "#EF4444", color: "#FFF", fontSize: 10, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>{isA ? "A" : "B"}</div>}
+                  <div style={{ fontWeight: 700, fontSize: 13, color: "#111827", paddingRight: isSel ? 24 : 0, lineHeight: 1.3 }}>{cov.name}</div>
+                  <div style={{ marginTop: 5, display: "inline-block", background: isA ? "#DBEAFE" : isB ? "#FEE2E2" : "#F3F4F6", color: isA ? "#1D4ED8" : isB ? "#DC2626" : "#4B5563", borderRadius: 5, padding: "2px 7px", fontSize: 10.5, fontWeight: 600 }}>{cov.sub}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {(result || error || loading) && (
+          <div ref={resultRef} style={{ background: "#FFF", border: "1.5px solid #E5E7EB", borderRadius: 14, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,.07)" }}>
+            <div style={{ background: "linear-gradient(135deg,#0F172A,#1E3A8A)", padding: "10px 16px", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <span style={{ background: "#3B82F6", color: "#FFF", borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 700 }}>AI 분석</span>
+              <span style={{ background: "#1E40AF", color: "#BFDBFE", borderRadius: 6, padding: "3px 9px", fontSize: 11.5, fontWeight: 700 }}>A. {selA?.name} ({selA?.sub})</span>
+              <span style={{ color: "#475569", fontSize: 10 }}>vs</span>
+              <span style={{ background: "#991B1B", color: "#FECACA", borderRadius: 6, padding: "3px 9px", fontSize: 11.5, fontWeight: 700 }}>B. {selB?.name} ({selB?.sub})</span>
+            </div>
+            <div style={{ padding: "22px 24px" }}>
+              {loading && <div style={{ display: "flex", alignItems: "center", gap: 10, color: "#6B7280", fontSize: 13 }}><span style={{ width: 16, height: 16, border: "2px solid #DBEAFE", borderTopColor: "#1D4ED8", borderRadius: "50%", display: "inline-block", animation: "spin .8s linear infinite" }} />약관을 읽고 분석 중입니다...</div>}
+              {error && <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 8, padding: "12px 16px", color: "#B91C1C", fontSize: 13 }}>⚠️ {error}</div>}
+              {result && <Md text={result} />}
+              {result && <div style={{ marginTop: 20, padding: "8px 12px", background: "#F8FAFC", borderRadius: 6, fontSize: 10.5, color: "#94A3B8" }}>※ 디비디비딥은 실수하거나 틀릴 수 있습니다. 정확한 내용은 반드시 원문을 확인하세요.</div>}
+            </div>
+          </div>
+        )}
+
         {!result && !loading && !error && (
           <div style={{ textAlign: "center", padding: "28px", color: "#94A3B8", fontSize: 13, lineHeight: 2 }}>
             위에서 카테고리를 선택하고<br />
