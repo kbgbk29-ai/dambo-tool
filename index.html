@@ -226,14 +226,14 @@ function App() {
             const cc2 = CAT_COLOR[cat] || "#374151";
             return (
               <div key={cat} style={{ marginBottom: 10 }}>
-                <div style={{ fontSize: 9.5, color: cc2, fontWeight: 700, marginBottom: 5 }}>{cat.toUpperCase()}</div>
+                <div style={{ fontSize: 14, color: cc2, fontWeight: 700, marginBottom: 5 }}>{cat.toUpperCase()}</div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                   {gs.map(g => {
                     const isActive = group.id === g.id;
                     return (
                       <button key={g.id} onClick={() => switchGroup(g)} style={{ background: isActive ? cc2 : "#F8FAFC", color: isActive ? "#FFF" : "#374151", border: isActive ? `2px solid ${cc2}` : "1.5px solid #E5E7EB", borderRadius: 8, padding: "5px 11px", fontSize: 12, fontWeight: isActive ? 700 : 500, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
                         {g.icon} {g.label}
-                        <span style={{ background: isActive ? "rgba(255,255,255,.25)" : "#E5E7EB", color: isActive ? "#FFF" : "#6B7280", borderRadius: 9999, padding: "0 5px", fontSize: 9.5, fontWeight: 700 }}>{g.coverages.length}</span>
+                        <span style={{ background: isActive ? "rgba(255,255,255,.25)" : "#E5E7EB", color: isActive ? "#FFF" : "#6B7280", borderRadius: 9999, padding: "0 5px", fontSize: 14, fontWeight: 700 }}>{g.coverages.length}</span>
                       </button>
                     );
                   })}
