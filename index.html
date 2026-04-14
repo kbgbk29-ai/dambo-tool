@@ -261,7 +261,7 @@ function App() {
 
       {/* A 카드 */}
       {idx === 0 && (
-        <div key={lbl} style={{ display: "flex", alignItems: "center", gap: 7, width: "100%", paddingTop: 8, paddingBottom: 6 }}>
+        <div key={lbl} style={{ display: "flex", alignItems: "center", gap: 7, width: "100%", paddingTop: 8 }}>
           <div style={{ background: bg, color: tc, borderRadius: 6, padding: "2px 7px", fontSize: 10, fontWeight: 700 }}>
             {lbl}
           </div>
@@ -352,6 +352,7 @@ function App() {
         border: "none",
         borderRadius: 7,
         padding: "8px 18px",
+        paddingBottom: 6,
         fontSize: 13,
         fontWeight: 700,
         cursor: (!selA || !selB || loading) ? "default" : "pointer",
