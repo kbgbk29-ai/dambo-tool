@@ -78,7 +78,7 @@ function Md({ text }) {
           return (
             <div key={bi} style={{ marginTop: bi === 0 ? 0 : 22, marginBottom: 10 }}>
               <div style={{ fontWeight: 700, fontSize: 14, color: "#1E3A8A", paddingBottom: 6, borderBottom: "2px solid #DBEAFE", display: "flex", alignItems: "center", gap: 6 }}>
-                <span style={{ color: "#3B82F6", fontSize: 11 }}>◆</span>{first.slice(3)}
+                <span style={{ color: "#3B82F6", fontSize: 22 }}>◆</span>{first.slice(3)}
               </div>
               <div style={{ marginTop: 8, lineHeight: 1.9 }}>
                 {lines.slice(1).map((l, li) => renderLine(l, `${bi}-${li}`))}
