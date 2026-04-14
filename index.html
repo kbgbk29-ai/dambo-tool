@@ -20,53 +20,56 @@ const CAT_COLOR = {"암 진단": "#B91C1C", "암 치료": "#C2410C", "뇌혈관"
 const CAT_ORDER = ["암 진단", "암 치료", "뇌혈관", "심장", "수술", "입원", "펫보험", "치아"];
 
 
-async function compareWithClaude(a, b) {
+async function compareWithClaude(a, b, onChunk) {
   const nameA = `${a.name} (${a.sub})`;
   const nameB = `${b.name} (${b.sub})`;
-  const textA = a.text.slice(0, 2000);
-  const textB = b.text.slice(0, 2000);
+  const textA = a.text.slice(0, 1200);
+  const textB = b.text.slice(0, 1200);
+
   const res = await fetch("/api/compare", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 700,
       messages: [{
         role: "user",
-        content: `YOU MUST REPLY IN KOREAN ONLY. DO NOT USE ANY OTHER LANGUAGE.
-당신은 DB손해보험 보험설계사 전용 담보 분석 전문가입니다. 반드시 한국어로만 답변하세요.
-아래 두 담보의 약관을 읽고, 설계사가 고객에게 바로 설명할 수 있도록 차이점 중심으로 분석해주세요.
+        content: `한국어로만 답하세요. DB손보 설계사용 담보 비교입니다.
+담보 A: **${nameA}** / 담보 B: **${nameB}**
+「담보 A」「담보 B」표현 금지, 반드시 실제 담보명 사용.
 
-비교 담보
-- 첫 번째: ${nameA}
-- 두 번째: ${nameB}
-
-【첫 번째 담보 약관】
-${textA}
-
-【두 번째 담보 약관】
-${textB}
-
-⚠️ 필수 규칙: "담보 A" "담보 B" 라는 표현은 절대 쓰지 마세요.
-반드시 실제 담보명을 **굵게** 표기하세요.
-- 첫 번째 → **${nameA}**
-- 두 번째 → **${nameB}**
-
-다음 구조로 작성해주세요:
+[A약관] ${textA}
+[B약관] ${textB}
 
 ## 핵심 차이 한 줄 요약
 ## 보장 범위 차이
 ## 지급 조건·횟수 차이
-## 어떤 고객에게 어느 담보가 적합한가
+## 고객 추천 기준
 ## 설계사 주의사항`
       }]
     })
   });
-  const d = await res.json();
-  if (d.error) throw new Error(d.error.message);
-  return d.content[0].text;
-}
 
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    buffer = lines.pop();
+    for (const line of lines) {
+      if (!line.startsWith("data: ")) continue;
+      const data = line.slice(6).trim();
+      if (data === "[DONE]") return;
+      try {
+        const parsed = JSON.parse(data);
+        if (parsed.error) throw new Error(parsed.error);
+        if (parsed.text) onChunk(parsed.text);
+      } catch (e) { if (e.message) throw e; }
+    }
+  }
+}
 function Md({ text }) {
   const blocks = text.split(/\n{2,}/);
   return (
@@ -154,18 +157,24 @@ function App() {
   const switchGroup = (g) => {
     setGroup(g); setSelA(null); setSelB(null); setResult(""); setError("");
   };
-
-  const compare = async () => {
-    if (!selA || !selB) return;
-    setLoading(true); setError(""); setResult("");
-    try {
-      const txt = await compareWithClaude(selA, selB);
-      setResult(txt);
-      setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
-    } catch (e) { setError(e.message); }
-    finally { setLoading(false); }
-  };
-
+const compare = async () => {
+  if (!selA || !selB) return;
+  setLoading(true); setError(""); setResult("");
+  let isFirst = true;
+  try {
+    await compareWithClaude(selA, selB, (chunk) => {
+      setResult(prev => {
+        const next = prev + chunk;
+        if (isFirst) {
+          isFirst = false;
+          setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+        }
+        return next;
+      });
+    });
+  } catch (e) { setError(e.message); }
+  finally { setLoading(false); }
+};
   const cats = {};
   CAT_ORDER.forEach(c => { cats[c] = []; });
   GROUPS.forEach(g => { if (cats[g.category]) cats[g.category].push(g); });
