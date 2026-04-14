@@ -23,7 +23,7 @@ module.exports = async function handler(req, res) {
 
     const payload = JSON.stringify({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 500,
+      max_tokens: 800,
       stream: true,
       messages: [{ role: "user", content: userMessage }]
     });
