@@ -4,7 +4,6 @@ module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  res.setHeader("Content-Type", "application/json; charset=utf-8");
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
@@ -24,17 +23,23 @@ module.exports = async function handler(req, res) {
 
     const payload = JSON.stringify({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 1500,
+      max_tokens: 500,
+      stream: true,
       messages: [{ role: "user", content: userMessage }]
     });
 
-    const data = await new Promise((resolve, reject) => {
+    // SSE 헤더 설정
+    res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    await new Promise((resolve, reject) => {
       const options = {
         hostname: "api.anthropic.com",
         path: "/v1/messages",
         method: "POST",
         headers: {
-          "Content-Type": "application/json; charset=utf-8",
+          "Content-Type": "application/json",
           "x-api-key": apiKey,
           "anthropic-version": "2023-06-01",
           "Content-Length": Buffer.byteLength(payload, "utf8"),
@@ -42,21 +47,30 @@ module.exports = async function handler(req, res) {
       };
 
       const request = https.request(options, (response) => {
-        const chunks = [];
-        response.on("data", chunk => chunks.push(chunk));
-        response.on("end", () => {
-          try {
-            const raw = Buffer.concat(chunks).toString("utf8");
-            const claudeData = JSON.parse(raw);
-            if (claudeData.error) {
-  return resolve({ content: [{ type: "text", text: "API 에러: " + JSON.stringify(claudeData.error) }] });
-}
-            const text = claudeData?.content?.[0]?.text || "Error: " + JSON.stringify(claudeData).slice(0, 200);
-            resolve({ content: [{ type: "text", text }] });
-          } catch (e) {
-            reject(new Error("Parse error"));
+        let buffer = "";
+        response.on("data", chunk => {
+          buffer += chunk.toString("utf8");
+          const lines = buffer.split("\n");
+          buffer = lines.pop(); // 미완성 줄은 보관
+
+          for (const line of lines) {
+            if (!line.startsWith("data: ")) continue;
+            const data = line.slice(6).trim();
+            if (data === "[DONE]") continue;
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.type === "content_block_delta" && parsed.delta?.text) {
+                res.write(`data: ${JSON.stringify({ text: parsed.delta.text })}\n\n`);
+              }
+            } catch (_) {}
           }
         });
+        response.on("end", () => {
+          res.write("data: [DONE]\n\n");
+          res.end();
+          resolve();
+        });
+        response.on("error", reject);
       });
 
       request.on("error", reject);
@@ -64,8 +78,12 @@ module.exports = async function handler(req, res) {
       request.end();
     });
 
-    return res.status(200).json(data);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    if (!res.headersSent) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);
+      res.end();
+    }
   }
 };
